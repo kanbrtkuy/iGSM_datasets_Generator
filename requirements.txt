@@ -1,0 +1,16 @@
+torch>=2.6.0
+torchvision>=0.21.0
+torchaudio>=2.6.0
+transformers>=4.48.3
+tqdm>=4.67.1
+numpy>=2.2.3
+matplotlib>=3.10.0
+networkx>=3.4.2
+pandas>=2.2.3
+huggingface-hub>=0.28.1
+pillow>=11.1.0
+sympy>=1.13.1
+regex>=2024.11.6
+pyyaml>=6.0.2
+typing-extensions>=4.12.2
+filelock>=3.17.0
