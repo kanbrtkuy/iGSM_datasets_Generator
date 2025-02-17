@@ -56,31 +56,24 @@ Available topics:
 Directory Structure
 ```
 ./GSM8K_GENERATOR/output/gsm8k_extended/
-├── dataset_info.json
 ├── train.json
-├── validation.json
-└── test.json
+└── inference.json
 ```
 
 ### Data Split Distribution
 
-1. Training set: 80% (6800 problems)
-2. Validation set: 10% (850 problems)
-3. Test set: 10% (850 problems)
+1. Training set: 90% (7650 problems)
+2. Inference set: 10% (850 problems)
 
 ### Example Output
 Here's an example of a generated problem:
 ```json
 {
-    "question": "The number of each Skyview University's Engineering Workshop equals each Skyview University's Number Theory Room. The number of each Skyview University's Number Theory Room equals 19 times as much as each Seaview University's Robotics Lab. The number of each Meadowland University's Robotics Lab equals 11. The number of each Seaview University's Robotics Lab equals 3 more than each Meadowland University's Classroom. How many Engineering Workshop does Skyview University have?",
-    "solution": "Define Meadowland University's Robotics Lab as U; so U = 11. Define Meadowland University's Classroom as d; so d = U = 11. Define Seaview University's Robotics Lab as M; so M = 3 + d = 3 + 11 = 14. Define Skyview University's Number Theory Room as F; so F = 19 * M = 19 * 14 = 13. Define Skyview University's Engineering Workshop as l; so l = F = 13.",
-    "answer": "13",
-    "metadata": {
-        "difficulty": "med",
-        "topic": "basic_arithmetic",
-        "steps_required": 5,
-        "numerical_answer": "13"
-    }
+  "text": "Question:  The number of each Skyview University's Engineering Workshop equals each Skyview University's Number Theory Room. The number of each Skyview University's Number Theory Room equals 19 times as much as each Seaview University's Robotics Lab. The number of each Meadowland University's Robotics Lab equals 11. The number of each Seaview University's Robotics Lab equals 3 more than each Meadowland University's Classroom. How many Engineering Workshop does Skyview University have?\nSolution:  Define Meadowland University's Robotics Lab as U; so U = 11. Define Meadowland University's Classroom as d; so d = U = 11. Define Seaview University's Robotics Lab as M; so M = 3 + d = 3 + 11 = 14. Define Skyview University's Number Theory Room as F; so F = 19 * M = 19 * 14 = 13. Define Skyview University's Engineering Workshop as l; so l = F = 13.\nAnswer:  13\n\n",
+  "difficulty": "med",
+  "topic": "basic_arithmetic",
+  "steps_required": 5,
+  "numerical_answer": "13"
 }
 ```
 

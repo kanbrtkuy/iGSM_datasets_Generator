@@ -45,16 +45,15 @@ class MathProblemGenerator:
         # Calculate number of solution steps (split by periods, remove empty strings)
         solution_steps = [s.strip() for s in solution.split('.') if s.strip()]
         
+        # Format the text field
+        text = f"Question: {question}\nSolution: {solution}\nAnswer: {answer}\n\n"
+        
         return {
-            "question": question,
-            "solution": solution,
-            "answer": answer,
-            "metadata": {
-                "difficulty": difficulty,
-                "topic": topic,
-                "steps_required": len(solution_steps),
-                "numerical_answer": answer.strip()
-            }
+            "text": text,
+            "difficulty": difficulty,
+            "topic": topic,
+            "steps_required": len(solution_steps),
+            "numerical_answer": answer.strip()
         }
 
 class GSM8KDatasetCreator:
@@ -62,17 +61,17 @@ class GSM8KDatasetCreator:
         self.output_dir = output_dir
         self.generator = MathProblemGenerator()
         
-    def create_split(self, num_problems: int, split_name: str) -> List[Dict]:
-        """Create dataset split
+    def create_split(self, num_problems: int) -> List[Dict]:
+        """Create dataset problems
         
         Args:
             num_problems: Number of problems to generate
-            split_name: Name of the split ("train", "validation", "test")
             
         Returns:
             List of problem dictionaries
         """
         problems = []
+        generated_questions = set()  # Track unique questions
         
         difficulty_dist = {
             "easy": 0.3,  # 30% easy problems
@@ -80,7 +79,8 @@ class GSM8KDatasetCreator:
             "hard": 0.2   # 20% hard problems
         }
         
-        for _ in tqdm(range(num_problems), desc=f"Generating {split_name} set"):
+        pbar = tqdm(total=num_problems, desc="Generating problems")
+        while len(problems) < num_problems:
             try:
                 difficulty = random.choices(
                     list(difficulty_dist.keys()),
@@ -89,11 +89,18 @@ class GSM8KDatasetCreator:
                 topic = random.choice(self.generator.topics)
                 
                 problem = self.generator.generate_problem(difficulty, topic)
-                problems.append(problem)
+                
+                # Check if this question is unique
+                if problem["text"] not in generated_questions:
+                    generated_questions.add(problem["text"])
+                    problems.append(problem)
+                    pbar.update(1)
+                    
             except Exception as e:
                 print(f"Error generating problem: {str(e)}")
                 continue
             
+        pbar.close()
         return problems
 
     def create_dataset(self, total_problems: int):
@@ -106,45 +113,26 @@ class GSM8KDatasetCreator:
         os.makedirs(self.output_dir, exist_ok=True)
         
         # Calculate split sizes
-        train_size = int(total_problems * 0.8)
-        val_size = int(total_problems * 0.1)
-        test_size = total_problems - train_size - val_size
+        train_size = int(total_problems * 0.9)
+        inference_size = total_problems - train_size
         
-        # Generate splits
+        # Generate all problems
+        all_problems = self.create_split(total_problems)
+        
+        # Split problems
+        train_problems = all_problems[:train_size]
+        inference_problems = all_problems[train_size:]
+        
+        # Save splits
         splits = {
-            "train": self.create_split(train_size, "train"),
-            "validation": self.create_split(val_size, "validation"),
-            "test": self.create_split(test_size, "test")
+            "train": (train_problems, "train.json"),
+            "inference": (inference_problems, "inference.json")
         }
         
-        # Save each split
-        for split_name, problems in splits.items():
-            output_path = os.path.join(self.output_dir, f"{split_name}.json")
+        for split_name, (problems, filename) in splits.items():
+            output_path = os.path.join(self.output_dir, filename)
             with open(output_path, 'w', encoding='utf-8') as f:
-                json.dump({
-                    "version": "1.0",
-                    "split": split_name,
-                    "num_problems": len(problems),
-                    "problems": problems
-                }, f, indent=2, ensure_ascii=False)
-        
-        # Create dataset information file
-        dataset_info = {
-            "name": "GSM8K-Extended",
-            "version": "1.0",
-            "description": "Extended version of Grade School Math 8K dataset",
-            "total_problems": total_problems,
-            "splits": {
-                "train": train_size,
-                "validation": val_size,
-                "test": test_size
-            },
-            "topics": self.generator.topics,
-            "difficulty_levels": list(self.generator.difficulty_params.keys())
-        }
-        
-        with open(os.path.join(self.output_dir, "dataset_info.json"), 'w') as f:
-            json.dump(dataset_info, f, indent=2)
+                json.dump(problems, f, indent=2, ensure_ascii=False)
 
 def main():
     # Set random seeds for reproducibility
@@ -166,11 +154,12 @@ def main():
         with open(os.path.join(OUTPUT_DIR, "train.json"), 'r') as f:
             train_data = json.load(f)
             print("\nExample problem from training set:")
-            example = train_data["problems"][0]
-            print("Question:", example["question"])
-            print("Solution:", example["solution"])
-            print("Answer:", example["answer"])
-            print("Metadata:", example["metadata"])
+            example = train_data[0]  # Changed to access first element directly
+            print("Text:", example["text"])
+            print("Difficulty:", example["difficulty"])
+            print("Topic:", example["topic"])
+            print("Steps Required:", example["steps_required"])
+            print("Numerical Answer:", example["numerical_answer"])
     except Exception as e:
         print(f"Error reading example: {str(e)}")
 
