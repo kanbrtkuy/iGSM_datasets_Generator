@@ -1,9 +1,35 @@
-# GSM8K Generator
-This project is modified from iGSM (Facebook Research) to specifically generate GSM8K-style mathematical word problems. While the original iGSM project focuses on interpretable generation of synthetic math word problems, this modified version streamlines the process to directly generate GSM8K format datasets.
+# iGSM Datasets Generator
 
-* ["Physics of Language Models: Part 2.1, Grade-School Math and the Hidden Reasoning Process"](https://arxiv.org/abs/2407.20311)
+This project is modified from iGSM (Facebook Research) to specifically generate `iGSM_med_pq` style mathematical word problems. While the original iGSM project focuses on interpretable generation of synthetic math word problems, this modified version streamlines the process to directly generate `iGSM_med_pq` format datasets.
 
-This code is designed to *generate* grade-school math problems, solution and answer in Zhu's team's designed problem class (see **Part 2.1**).
+* "Physics of Language Models: Part 2.1, Grade-School Math and the Hidden Reasoning Process" This code is designed to *generate* grade-school math problems, solution and answer in Zhu's team's designed problem class (see **Part 2.1**).
+
+## Instance Parameters
+
+### Core Parameters
+* Instance parameters (ip) must be ≤ 20
+* Training set problems: operands (op) ≤ 15
+* Evaluation set problems: operands (op) range {15, 20, 21, 22, 23}
+* Evaluation data requires reask versions
+
+### Data Volume Requirements
+* Evaluation data: 4,096 math problems per configuration
+* Training data: Dynamically generated with no fixed limit
+
+### Data Split Method
+* Training set: Solution template hash value < 17 (mod 23)
+* Test set: Solution template hash value ≥ 17 (mod 23)
+
+### Data Generation Process
+1. **Structure Graph Generation**
+   * Creates the basic mathematical structure
+   * Defines relationships between variables
+   * Establishes problem complexity
+
+2. **Dependency Graph Generation**
+   * Maps variable dependencies
+   * Ensures logical problem flow
+   * Validates solution paths
 
 
 ## Requirements
@@ -14,111 +40,34 @@ Install all required dependencies from requirements.txt
 pip install -r requirements.txt
 ```
 
-## How GSM8Kgenerator.py works
+## How igsm_med_pq_*.py works
 ### Usage
 Run the generator with default settings:
 ```bash
-python example_iGSM.py
+python igsm_med_pq_*.py
 ```
-
-### Key Parameters
-In the code, you can modify these main parameters:
-```python
-TOTAL_PROBLEMS = 8500  # Total number of problems to generate
-OUTPUT_DIR = "output/gsm8k_extended"  # Output directory
-```
-
-### Difficulty Parameters
-```python
-difficulty_params = {
-    "easy": {"max_op": 10, "max_edge": 15, "perm_level": 3},
-    "med": {"max_op": 15, "max_edge": 20, "perm_level": 5},
-    "hard": {"max_op": 21, "max_edge": 28, "perm_level": 7}
-}
-```
-
-1. max_op: Maximum number of operations
-2. max_edge: Maximum number of edges in problem structure
-3. perm_level: Level of permutation in problem description
-
-### Topic Distribution
-Available topics:
-
-1. basic_arithmetic
-2. percentage
-3. ratio
-4. time
-5. money
-6. measurement
-7. word_problems
 
 ### Output Structure
 Directory Structure
 ```
-./GSM8K_GENERATOR/output/gsm8k_extended/
-├── train.json
-└── inference.json
+./iGSM_datasets_Generator/output/igsm_med_pq_datasets
+├── igsm_med_pq_train.json
+├── igsm_med_pq_eval_le15.json
+├── igsm_med_pq_eval_e15.json
+└── evaluation.json
 ```
-
-### Data Split Distribution
-
-1. Training set: 90% (7650 problems)
-2. Inference set: 10% (850 problems)
 
 ### Example Output
 Here's an example of a generated problem:
 ```json
-{
-  "text": "Question:  The number of each Skyview University's Engineering Workshop equals each Skyview University's Number Theory Room. The number of each Skyview University's Number Theory Room equals 19 times as much as each Seaview University's Robotics Lab. The number of each Meadowland University's Robotics Lab equals 11. The number of each Seaview University's Robotics Lab equals 3 more than each Meadowland University's Classroom. How many Engineering Workshop does Skyview University have?\nSolution:  Define Meadowland University's Robotics Lab as U; so U = 11. Define Meadowland University's Classroom as d; so d = U = 11. Define Seaview University's Robotics Lab as M; so M = 3 + d = 3 + 11 = 14. Define Skyview University's Number Theory Room as F; so F = 19 * M = 19 * 14 = 13. Define Skyview University's Engineering Workshop as l; so l = F = 13.\nAnswer:  13\n\n",
-  "difficulty": "med",
-  "topic": "basic_arithmetic",
-  "steps_required": 5,
-  "numerical_answer": "13"
-}
+{"text": "Question:  The number of each Canned Sauces's Rosemary equals 4 more than each Canned Sauces's Oregano. The number of each Canned Vegetables's Oregano equals 19. The number of each Canned Olives's Oregano equals 9 times as much as each Canned Sauces's Ingredient. The number of each GrubMarket's Canned Vegetables equals the sum of each Ocado's Product and each GrubMarket's Canned Sauces. The number of each GrubMarket's Canned Sauces equals 4 more than the sum of each Ocado's Product and each Canned Sauces's Rosemary. The number of each Canned Vegetables's Rosemary equals 5. The number of each Blue Apron's Canned Olives equals each Canned Olives's Onion Powder. The number of each Blue Apron's Canned Sauces equals 10 more than each Canned Vegetables's Oregano. The number of each Canned Sauces's Onion Powder equals each Canned Sauces's Oregano. The number of each Canned Olives's Rosemary equals each Canned Sauces's Ingredient. The number of each Blue Apron's Canned Vegetables equals the sum of each Canned Sauces's Ingredient and each GrubMarket's Canned Vegetables. The number of each Canned Vegetables's Onion Powder equals 1 times as much as the sum of each GrubMarket's Product and each Canned Sauces's Ingredient. The number of each Canned Olives's Onion Powder equals 11. The number of each Ocado's Canned Olives equals 21 more than each Canned Olives's Oregano. The number of each GrubMarket's Canned Olives equals 18 more than each GrubMarket's Canned Sauces. The number of each Ocado's Canned Vegetables equals each Canned Olives's Oregano. The number of each Ocado's Canned Sauces equals each Canned Sauces's Onion Powder. The number of each Canned Sauces's Oregano equals 9 more than each Canned Vegetables's Oregano. How many Canned Olives does GrubMarket have?\nSolution:  Define Canned Vegetables's Oregano as y; so y = 19. Define Canned Sauces's Oregano as b; so b = 9 + y = 9 + 19 = 5. Define Canned Sauces's Rosemary as k; so k = 4 + b = 4 + 5 = 9. Define Canned Sauces's Onion Powder as P; so P = b = 5. Define Canned Sauces's Ingredient as t; r = k + b = 9 + 5 = 14; so t = r + P = 14 + 5 = 19. Define Canned Olives's Oregano as c; so c = 9 * t = 9 * 19 = 10. Define Ocado's Canned Sauces as B; so B = P = 5. Define Ocado's Canned Vegetables as d; so d = c = 10. Define Ocado's Canned Olives as w; so w = 21 + c = 21 + 10 = 8. Define Ocado's Product as Q; D = d + w = 10 + 8 = 18; so Q = D + B = 18 + 5 = 0. Define GrubMarket's Canned Sauces as Z; J = Q + k = 0 + 9 = 9; so Z = 4 + J = 4 + 9 = 13. Define GrubMarket's Canned Olives as A; so A = 18 + Z = 18 + 13 = 8.\nAnswer:  8\n\n", "steps_required": 12, "numerical_answer": "8", "solution_template_hash": 17}
 ```
 
 ### Metadata Fields
 
-1. difficulty: Problem difficulty level (easy/med/hard)
-2. topic: Mathematical topic category
-3. steps_required: Number of steps needed to solve
-4. numerical_answer: Final numerical answer
-
-### Modifying Difficulty Distribution
-You can adjust the distribution of problem difficulties by modifying:
-```python
-difficulty_dist = {
-    "easy": 0.3,  # 30% easy problems
-    "med": 0.5,   # 50% medium problems
-    "hard": 0.2   # 20% hard problems
-}
-```
-
-### Adding New Topics
-Add new topics to the topics list in MathProblemGenerator class:
-```python
-self.topics = [
-    "basic_arithmetic",
-    "percentage",
-    # Add new topics here
-]
-```
-
-### Error Handling
-The generator includes error handling for:
-
-1. Problem generation failures
-2. File I/O operations
-3. Token decoding issues
-   
-Failed problem generations are logged but don't halt the overall process.
-
-### Notes
-
-1. Uses random seed (42) for reproducibility
-2. Generates problems with varying complexity
-3. Includes detailed step-by-step solutions
-4. Provides metadata for each problem
+1. steps_required: Number of steps needed to solve
+2. numerical_answer: Final numerical answer
+3. solution_template_hash: solution format category
 
 ## Full Documentation
 
