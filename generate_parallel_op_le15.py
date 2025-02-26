@@ -1,5 +1,6 @@
 from data_gen.pretrain.id_gen import IdGen
 from tools.tools import tokenizer, fix_seed, to_sketch, to_hash
+from tools.tools_test import true_correct
 import random
 import json
 import os
@@ -36,6 +37,13 @@ def generate_single_sample(args):
         prob_text = tokenizer.decode(id_gen.prob_token)
         sol_text = tokenizer.decode(id_gen.sol_token)
         ans_text = tokenizer.decode(id_gen.ans_token)
+        
+        # 添加解决方案验证
+        correct, my_print, parser = true_correct(sol_text, id_gen.problem)
+        
+        # 只保留验证通过的问题
+        if not correct:
+            return None
         
         # Calculate solution template hash
         sketch = to_sketch(id_gen.problem, prob=None, sol=sol_text)

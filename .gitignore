@@ -1,0 +1,2 @@
+# 忽略 output/igsm_med_pq_datasets 目录下的所有 JSON 文件
+output/igsm_med_pq_datasets/*.json
