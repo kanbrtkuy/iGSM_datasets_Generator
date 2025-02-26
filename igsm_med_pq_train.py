@@ -21,7 +21,7 @@ def generate_igsm_med_dataset(num_samples=500, seed=42):
     output_dir = "./output/igsm_med_pq_datasets"
     os.makedirs(output_dir, exist_ok=True)
     
-    file_path = os.path.join(output_dir, 'igsm_med_pq_train.json')
+    file_path = os.path.join(output_dir, 'igsm_med_pq_train_le15.json')
     
     # Create progress bar
     pbar = tqdm(total=num_samples, desc="Generating samples")
